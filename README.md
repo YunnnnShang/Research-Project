@@ -22,9 +22,9 @@ Make sure you have a Raspberry Pi with sufficient resources. A Raspberry Pi 5 or
 Install the 64-bit operating system (e.g., Raspberry Pi OS). This ensures that your system can fully utilize the available hardware resources.
 ### 4.Update the System:
 Ensure the Pi is up to date by using the following commands:
-    ```
-    sudo apt-get update
-    sudo apt-get upgrade
-    sudo apt update
-    sudo apt install -y python3-libcamera python3-kms++ python3-picamera2
-    ```
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt update
+sudo apt install -y python3-libcamera python3-kms++ python3-picamera2
+```
