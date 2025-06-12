@@ -42,15 +42,42 @@ Anaconda 2023.07-1
 
 5. **Why 64-bit Instead of 32-bit?**
    - The main reason is because with a 32-bit OS, each process is limited to using 3GB of RAM, even if you have an 8GB memory card. With the 64-bit OS, a process can access all 8GB at once, making it more efficient for memory-intensive tasks.
-### Installation
 
+### Installation
+Windows (PC) – YOLO & analysis environment
 1. **Clone the repo:**
    ```sh
    git clone https://github.com/Prae-Flott/camera_degradation_raspberry.git
     ```
 2. **Install Anaconda as described** [here](https://docs.anaconda.com/free/anaconda/install/index.html)
-3. **Create an environment**
-   with conda by putting this in your command line:
+3. **Create & activate the YOLOv8 environment**
+   Prepare the yolov8_env environment
+   ****A. Manually create the environment****
    ```sh
-   conda env create -f yolov8_picam.yml
+   # 1) Create an empty env named yolov8_env
+   conda create -n yolov8_env python=3.10 pip -y
+   conda activate yolov8_env
+
+   # 2) Install required packages
+   pip install \
+   ultralytics==8.* \
+   opencv-python \
+   brisque \
+   libsvm-official \
+   numpy \
+   matplotlib
    ```
+   ****B. Use the pre-built yolov8_env****
+   Download yolov8_env.tar.gz from our GitHub Releases.
+   Extract into your Conda envs folder:
+   ```
+   # Linux/macOS example
+   tar -xzf yolov8_env.tar.gz -C ~/anaconda3/envs/
+   # Windows PowerShell example
+   tar -xzf yolov8_env.tar.gz -C H:\anaconda3\envs\
+   ```
+4. **Activate the environment：**
+   ```sh
+   conda activate yolov8_env
+   ```
+By following these steps, you should have your environment set up and ready to run the project.
