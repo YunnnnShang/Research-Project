@@ -71,7 +71,7 @@ Add the ROS 2 package sources to your system's package manager.
    # Install development tools (recommended)
    sudo apt install -y ros-dev-tools
    ```
-4.**Install iRobot Create® 3 Specific Packages:**
+4. **Install iRobot Create® 3 Specific Packages:**
 These packages provide the necessary message definitions and tools for communicating with the Create 3 robot. 
    ```sh
    # Install Create 3 message definitions for Jazzy
@@ -80,12 +80,13 @@ These packages provide the necessary message definitions and tools for communica
    # Install other recommended build and ROS tools for Jazzy
    sudo apt install -y build-essential python3-colcon-common-extensions python3-rosdep ros-jazzy-rmw-cyclonedds-cpp
    ```
-5.**Configure Environment and Middleware (RMW):**
+5. **Configure Environment and Middleware (RMW):**
 To have your environment ready automatically, add the ROS 2 sourcing command to your .bashrc file.
    ```sh
-  echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
+   echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
    ```
-Set the default ROS 2 Middleware (RMW). This must match the RMW implementation on your robot (check its Application Configuration page).
+6. **Set the default ROS 2 Middleware (RMW):**
+This must match the RMW implementation on your robot (check its Application Configuration page).
    ```sh
    # Example for Fast RTPS (common default for Jazzy)
    echo "export RMW_IMPLEMENTATION=rmw_fastrtps_cpp" >> ~/.bashrc
@@ -93,13 +94,13 @@ Set the default ROS 2 Middleware (RMW). This must match the RMW implementation o
    # Or, if your robot uses Cyclone DDS:
    # echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> ~/.bashrc
    ```
-6.**Apply and Verify:**
+7. **Apply and Verify:**
 Apply the configuration changes to your current terminal session:
    ```sh
    source ~/.bashrc
    ```
 Verify: Connect your Raspberry Pi and Create 3 robot to the same network. Open a new terminal and run ros2 topic list. You should see a list of topics being published by the robot.
-7.**Python Dependencies for Local Scripts:**
+8. **Python Dependencies for Local Scripts:**
 Install Python packages required for the data extraction scripts on the Pi.
    ```sh
    pip install pandas scipy
