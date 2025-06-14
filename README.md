@@ -129,7 +129,7 @@ The Windows PC is used for all heavy data processing, analysis, visualization, a
    ****B. Use the pre-built yolov8_env****
    Download yolov8_env.tar.gz from Releases.
    Extract into your Conda envs folder:
-   ```
+   ```sh
    # Linux/macOS example
    tar -xzf yolov8_env.tar.gz -C ~/anaconda3/envs/
    # Windows PowerShell example
