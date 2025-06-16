@@ -141,7 +141,7 @@ By following these steps, you should have your environment set up and ready to r
 
 <!-- ROADMAP -->
 ## Roadmap
-Descripition of the milestones of this project. Example:
+Descripition of the milestones of this project. 
 - [x] Make the camera running: Show video stream on Raspberry Pi 5 using python (Felix task)
 - [x] Install Yolov8 (ultralytics), get it running on the Pi5 (at first try nano version)
   - [x] Yolov8 object detection
