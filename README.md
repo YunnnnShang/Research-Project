@@ -117,6 +117,7 @@ The Windows PC is used for all heavy data processing, analysis, visualization, a
     ```
 3. **Prepare the yolov8_env Conda Environment**
    Two options to get a ready-to-use yolov8_env:
+   
    ****A. Manually create the environment****
    ```sh
    # Create a new environment named 'yolov8_env' with Python 3.11
