@@ -102,6 +102,7 @@ Apply the configuration changes to your current terminal session:
    source ~/.bashrc
    ```
 Verify: Connect your Raspberry Pi and Create 3 robot to the same network. Open a new terminal and run ros2 topic list. You should see a list of topics being published by the robot.
+
 8. **Python Dependencies for Local Scripts:**
 Install Python packages required for the data extraction scripts on the Pi.
    ```sh
