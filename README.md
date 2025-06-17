@@ -160,4 +160,167 @@ Descripition of the milestones of this project.
 
 
 ## Project Workflow
-###
+### 1. Start SLAM & Navigation on Raspberry Pi
+1. connect to rpi
+   ```sh
+   ssh r5@<RPI_IP>
+   cd ~/ws
+   ```
+2. Excecute on rpi:
+   ```
+   ws/start_slam_nav.sh
+   ```
+3. Publish initial pose
+   for **office**
+   ```sh
+   ros2 topic pub --once /initialpose geometry_msgs/msg/PoseWithCovarianceStamped '{
+     header: {
+       stamp: {sec: 0, nanosec: 0},    # Zeitstempel 0 (Standard für initialpose)
+       frame_id: "map"                # Standard-Frame "map"
+     },
+     pose: {
+       pose: {
+         position: {                  # Position am Ursprung
+           x: -1.6,
+           y: 0.3,
+           z: 0.0
+         },
+         orientation: {               
+           x: 0.0,
+           y: 0.0,
+           z: 0.0872,
+           w: 0.9962                     
+         }
+       },
+       covariance: [ # Kovarianz mit kleiner Unsicherheit (wie zuvor)
+         0.25, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.25, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.06853891909122467
+       ]
+     }
+   }'
+   ```
+   for **lab**:
+   ```sh
+   ros2 topic pub --once /initialpose geometry_msgs/msg/PoseWithCovarianceStamped '{
+     header: {
+       stamp: {sec: 0, nanosec: 0},    # Zeitstempel 0 (Standard für initialpose)
+       frame_id: "map"                # Standard-Frame "map"
+     },
+     pose: {
+       pose: {
+         position: {                  # Position am Ursprung
+           x: 0.0,
+           y: 0.0,
+           z: 0.0
+         },
+         orientation: {               
+           x: 0.0,
+           y: 0.0,
+           z: 0.0872,
+           w: 0.9962                     
+         }
+       },
+       covariance: [ # Kovarianz mit kleiner Unsicherheit (wie zuvor)
+         0.25, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.25, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.06853891909122467
+       ]
+     }
+   }'
+   ```
+4. (Optional) Visualize in RViz on PC:
+   ```sh
+   #On PC
+   export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+   export FASTRTPS_DEFAULT_PROFILES_FILE=~/ws/src/create3_examples/create3_republisher/dds-config/fastdds-passive-unicast.xml
+   ros2 run rviz2 rviz2 -d $(ros2 pkg prefix nav2_bringup)/share/nav2_bringup/rviz/nav2_default_view.rviz
+   ```
+### 2. Start Camera Stream & Verify
+1. On Pi, launch camera node at 1 FPS:
+   ```sh
+   #On Pi: Start Camera
+   ros2 run camera_ros camera_node --ros-args -p camera:=0 -p role:=viewfinder -p width:=1920 -p height:=1080 -p FrameDurationLimits:="[1000000,1000000]" -p AeEnable:=false -p ExposureTime:=20000 -p AnalogueGain:=6.0
+   ```
+2. View image stream:
+   ```sh
+   #On Pi or on PC: Show image
+   ros2 run rqt_image_view rqt_image_view /camera/image_raw _image_transport:=compressed
+   ```
+3. Check camera topics:
+   ```sh   
+   ros2 topic echo /camera/image_raw
+   ros2 topic echo /camera/image_raw/compressed
+   ```
+### 3. Start Robot Driving
+1. On Pi, configure DDS & stop daemon:
+   ```sh
+   export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+   export FASTRTPS_DEFAULT_PROFILES_FILE=~/ws/src/create3_examples/create3_republisher/dds-config/fastdds-passive-unicast.xml
+   ros2 daemon stop
+   ```
+2. Launch IR-based avoidance:
+   ```sh
+   ros2 run create3_teleop ir_avoider
+   ```
+### 4. Record Data
+1. On Pi, record topics (Ctrl+C to stop):
+   ```sh
+   ros2 bag record /odom /tf /camera/image_raw /cmd_vel /imu
+   ```
+2. Transfer bags to PC:
+   ```sh
+   rsync -avz r5@<RPI_IP>:/home/r5/rosbagr5_20250514/ ~/rosbagr5_20250514/
+   ```
+### 5. Extract Frames (1 FPS) 
+**Option A: ROS2 subscriber**
+   ```sh
+   # Terminal A: play bag
+   cd ~/rosbagr5_20250514/rosbag2_<timestamp>
+   source /opt/ros/humble/setup.bash
+   ros2 bag play . --clock
+   # Terminal B: extract frames
+   dd ~/ws
+   conda activate yolov8_env
+   python live_frame_extractor.py
+   ```
+**Option B: libcamera-still timelapse**
+   ```sh
+   mkdir -p ~/frames && \
+   libcamera-still --nopreview --width 1024 --height 1024 \--timelapse 1000 -t 60000 -o ~/frames/frame_%04d.jpg
+   ```
+### 6. YOLOv8 Detection
+   ```sh
+   cd ~/extracted_frames
+   yolo detect predict \
+     --model yolov8n.pt --source . --save-txt \
+     --project ~/yolo_results --name run1
+   ```
+### 7. Compute IQA & Merge Results
+   ```sh
+   conda activate yolov8_env
+   python process_and_merge_data.py \
+     ~/rosbagr5_20250514/r5_8 \
+     ~/rosbagr5_20250514/r5_8/bag_r5_8.mcap
+   ```
+
+
+
+<!-- Project Structure -->
+## Project Structure
+```text
+camera_degradation_raspberry/
+├── data/      # raw .mcap bags, frames
+├── scripts/   # extraction & analysis scripts
+├── models/    # YOLOv8 weights
+├── results/   # detection & IQA outputs
+├── README.md  # this file
+├── LICENSE.txt
+└── envs/      # optional environment archive
+```
