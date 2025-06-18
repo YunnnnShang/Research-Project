@@ -163,7 +163,7 @@ Descripition of the milestones of this project.
 
 
 ## Project Workflow
-### 1. Start SLAM & Navigation on Raspberry Pi
+### Step 1: Start SLAM and Navigation
 1. connect to rpi
    ```sh
    ssh r5@<RPI_IP>
@@ -173,7 +173,7 @@ Descripition of the milestones of this project.
    ```
    ws/start_slam_nav.sh
    ```
-3. Publish initial pose
+3. Publish the Initial Pose to localize the robot on the map. You must use a pose specific to your environment (e.g., office or lab).
    for **office**
    ```sh
    ros2 topic pub --once /initialpose geometry_msgs/msg/PoseWithCovarianceStamped '{
@@ -245,7 +245,8 @@ Descripition of the milestones of this project.
    export FASTRTPS_DEFAULT_PROFILES_FILE=~/ws/src/create3_examples/create3_republisher/dds-config/fastdds-passive-unicast.xml
    ros2 run rviz2 rviz2 -d $(ros2 pkg prefix nav2_bringup)/share/nav2_bringup/rviz/nav2_default_view.rviz
    ```
-### 2. Start Camera Stream & Verify
+   
+### Step 2: Start and Verify Camera Stream
 1. On Pi, launch camera node at 1 FPS:
    ```sh
    #On Pi: Start Camera
@@ -261,7 +262,7 @@ Descripition of the milestones of this project.
    ros2 topic echo /camera/image_raw
    ros2 topic echo /camera/image_raw/compressed
    ```
-### 3. Start Robot Driving
+### Step 3: Start Robot Driving
 1. On Pi, configure DDS & stop daemon:
    ```sh
    export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
@@ -272,16 +273,14 @@ Descripition of the milestones of this project.
    ```sh
    ros2 run create3_teleop ir_avoider
    ```
-### 4. Record Data
-1. On Pi, record topics (Ctrl+C to stop):
+### Step 4: Record Data
+1. Start Recording:
+   On the Pi, open a new terminal, source your ROS 2 environment, and use ros2 bag record to save all necessary topics into an .mcap file.(Ctrl+C to stop):
    ```sh
    ros2 bag record /odom /tf /camera/image_raw /cmd_vel /imu
    ```
-2. Transfer bags to PC:
-   ```sh
-   rsync -avz r5@<RPI_IP>:/home/r5/rosbagr5_20250514/ ~/rosbagr5_20250514/
-   ```
-### 5. Extract Frames (1 FPS) 
+2. Perform Experiment: Drive the robot through the desired scenario (e.g., a 360° rotation) with and without the degradation element (e.g., a soiled glass).
+### Step 5: Extract Timestamped Image Frames (1 FPS) 
 **Option A: ROS2 subscriber**
    ```sh
    # Terminal A: play bag
@@ -293,37 +292,82 @@ Descripition of the milestones of this project.
    conda activate yolov8_env
    python live_frame_extractor.py
    ```
-**Option B: libcamera-still timelapse**
+**Option B: Use the Batch Script**
+On the Pi, use the batch_extract.sh script to process all your newly recorded .mcap files.
    ```sh
-   mkdir -p ~/frames && \
-   libcamera-still --nopreview --width 1024 --height 1024 \--timelapse 1000 -t 60000 -o ~/frames/frame_%04d.jpg
+  # On Pi: Ensure paths in the script are correct and run it
+  ./batch_scripts/batch_extract.sh
    ```
-### 6. YOLOv8 Detection
+Output: The script calls extract_frames.py to create folders of images, with each image named using its precise ROS timestamp (e.g., frame_1748876155339538905.png).
+### Step 5: Transfer Data to PC
+Transfer MCAP Files: Copy the original .mcap files to your Windows PC (e.g., to H:\project_data\raw_mcaps\). These are required for extracting pose data. rsync is a great tool for this on Linux/macOS, or use any file transfer client like WinSCP on Windows.
    ```sh
-   cd ~/extracted_frames
-   yolo detect predict \
-     --model yolov8n.pt --source . --save-txt \
-     --project ~/yolo_results --name run1
+   rsync -avz r5@<RPI_IP>:/home/r5/rosbagr5_20250514/ ~/rosbagr5_20250514/
    ```
-### 7. Compute IQA & Merge Results
+### Step 6: Run YOLOv8 Object Detection
+This phase takes place entirely on your Windows PC within your configured Conda environment (yolov8_env).
    ```sh
-   conda activate yolov8_env
-   python process_and_merge_data.py \
-     ~/rosbagr5_20250514/r5_8 \
-     ~/rosbagr5_20250514/r5_8/bag_r5_8.mcap
+   # In Anaconda Prompt with yolov8_env activated
+   python batch_scripts\batch_yolo_windows.py H:\project_data\processed_images windows_pc\run_yolov8_detection.py
    ```
-
-
+Output: A yolo_detections_...csv file is generated in each image folder, containing object detection results for every frame.
+### Step 7: Compute IQA, Extract Poses, and Merge Results
+This is the core step where all data streams are unified.
+1. Run the Consolidation Script: For each experimental run, execute process_and_merge_data.py. This script reads the YOLOv8 results, calculates BRISQE scores, reads the corresponding .mcap file to extract and synchronize poses, and merges everything.
+   ```sh
+   # Example for a single run
+   python windows_pc\process_and_merge_data.py ^
+       H:\project_data\processed_images\rosbagr5\r5_8 ^
+       H:\project_data\raw_mcaps\rosbagr5\r5_8\bag_r5_8.mcap
+   ```
+Output: The final, unified final_ml_dataset.csv is generated in each run folder.
+### Step 8: Final Comparative Analysis
+Run the Analysis Script: Use final_analysis.py to load the final datasets from the runs you want to compare.
+   ```sh
+   # Example comparing three specific runs
+   python windows_pc\final_analysis.py ^
+       H:\...\processed_images\rosbagr5\r5_8\final_ml_dataset.csv ^
+       H:\...\processed_images\rosbagr6\r6_7\final_ml_dataset.csv ^
+       H:\...\processed_images\rosbagr7\r7_7\final_ml_dataset.csv ^
+       --output_dir H:\project_data\final_reports
+   ```
+Output: The script prints summary statistics to the console and saves comparison plots to the specified output directory, allowing you to draw final conclusions about the impact of camera degradation.
 
 <!-- Project Structure -->
 ## Project Structure
 ```text
 camera_degradation_raspberry/
-├── data/      # raw .mcap bags, frames
-├── scripts/   # extraction & analysis scripts
-├── models/    # YOLOv8 weights
-├── results/   # detection & IQA outputs
-├── README.md  # this file
-├── LICENSE.txt
-└── envs/      # optional environment archive
+│
+├── .gitignore                     # Specifies files and directories to be ignored by Git
+├── LICENSE.txt                    # Your project's license file
+├── README.md                      # The main project documentation file (this file)
+│
+├── raspberry_pi/                  # Scripts designed to run specifically on the Raspberry Pi
+│   └── extract_frames.py          # Extracts timestamped image frames from .mcap files
+│
+├── windows_pc/                    # Scripts for data processing and analysis on the PC
+│   ├── run_yolov8_detection.py      # Runs YOLOv8 inference on a single folder of images
+│   ├── process_and_merge_data.py  # Calculates IQA, extracts poses, and merges all data
+│   ├── final_analysis.py            # Analyzes final datasets and generates comparison plots
+│   └── compare_specific_runs.py   # (Optional) For quick comparison of YOLOv8 results
+│
+├── batch_scripts/                 # Automation scripts to process multiple runs in batch
+│   ├── batch_extract.sh             # (For Raspberry Pi) Automates running extract_frames.py
+│   └── batch_yolo_windows.py      # (For Windows PC) Automates running run_yolov8_detection.py
+│
+├── data/                          # [NOT VERSIONED IN GIT] Local directory for all experimental data
+│   ├── raw_mcaps/                 # Store original .mcap files from experiments here
+│   └── processed_data/            # Store all generated data (frames, CSVs) here
+│
+├── reports/                       # [NOT VERSIONED IN GIT] Saved analysis reports and plots
+│
+└── environment/                   # Files for recreating the project's Python environment
+    └── requirements.txt             # A list of Python dependencies for pip
 ```
+Directory Explanations
+raspberry_pi/ & windows_pc/: These folders separate the code based on the execution environment. raspberry_pi contains scripts that interface with ROS 2 native libraries, while windows_pc contains scripts for data-heavy analysis tasks.
+batch_scripts/: Holds automation scripts to save time by processing large amounts of data without manual intervention.
+data/: This is the main data directory, which should be kept local and not committed to Git. It's split into raw_mcaps for pristine data preservation and processed_data for all generated outputs.
+models/: For storing the pre-trained YOLOv8 model weights you download. Also should be excluded from Git.
+reports/: A place to save the final outputs of your analysis, such as the comparison plots, making it easy to find your results.
+environment/: Contains files that define the necessary Python packages, allowing others (or your future self) to easily recreate the exact software environment needed to run the project.
