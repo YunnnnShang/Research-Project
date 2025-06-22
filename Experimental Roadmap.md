@@ -17,7 +17,7 @@ To systematically quantify and compare the performance impact of real-world came
 ### Phase 1: Baseline Performance Evaluation & Model Selection
 **Status:** ▶️ In Progress
 
-**Description:** Before investigating performance degradation, it is crucial to establish a precise performance baseline under ideal conditions. This phase addresses the resource usage and performance benchmarking outlined in the initial roadmap.
+**Description:** Before investigating performance degradation, it is crucial to establish a precise performance baseline under ideal conditions. This phase addresses the resource usage and performance benchmarking.
 
 **Checklist:**
   - [ ] Resource and Performance Benchmarking (on Raspberry Pi 5):\
