@@ -15,9 +15,9 @@ To systematically quantify and compare the performance impact of real-world came
   - [x] Established a complete data pipeline from data acquisition on the Raspberry Pi (rosbag) to processing and analysis on a host PC.
 
 ### Phase 1: Baseline Performance Evaluation & Model Selection
-**Status:** ▶️ In Progress
+**Status:** ✅ Completed
 
-**Description:** Before investigating performance degradation, it is crucial to establish a precise performance baseline under ideal conditions. This phase addresses the resource usage and performance benchmarking.
+**Description:** Before investigating performance degradation, it is critical to establish accurate performance benchmarks under ideal conditions. This phase focuses on resource usage and performance benchmarking. The core goal is to find out which model size can run stably and efficiently in this restricted environment.
 
 **Checklist:**
   - [ ] Resource and Performance Benchmarking (on Raspberry Pi 5):\
