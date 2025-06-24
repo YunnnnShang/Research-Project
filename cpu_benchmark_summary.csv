@@ -1,0 +1,4 @@
+Model,Avg_FPS,Avg_CPU_Usage (%),Avg_RAM_Usage (%)
+yolov8n,2.64,49.83,21.34
+yolov8s,0.99,43.79,21.93
+yolov8m,0.41,39.32,23.30
