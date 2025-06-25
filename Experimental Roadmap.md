@@ -68,14 +68,21 @@ To systematically quantify and compare the performance impact of real-world came
 
 **Checklist:**
   - [x] Execute yolo val evaluation commands on all three degradation levels (Level 0, 1, 2).
-  - [x] Obtained mAP scores for yolov8n detecting bottle across all levels, quantifying the performance degradation trend and log the results.
-        *Experimental Results*
-        
+  - [x] Obtained mAP scores for yolov8n detecting bottle across all levels, quantifying the performance degradation trend and log the results.\
+*Experimental Results*
+
 | Degradation Level |Physical Condition	|mAP50 Score|
 | --- | --- | --- |
 | Level 0	  | Clear / Control	  | 0.841 |
 | Level 1   | Haze Level 1  | 0.685 |
 | Level 2   | Haze Level 2  | 0.074 |
+
+*Key Conclusions*
+
+Baseline performance is robust: On clear images (Level 0), the yolov8n model performs well (mAP50 = 0.841), demonstrating the model's inherent capabilities.\
+Performance drops with degradation: After introducing mild blur (Level 1), the model performance drops significantly (by about 18.5%), but remains at a usable level.\
+Performance crash point: Under moderate blur (Level 2), the model performance drops off a cliff, with mAP50 dropping to 0.074, almost completely failing.\
+Preliminary argument: The experimental results strongly demonstrate that the reliability of standard pre-trained models decreases sharply when faced with real-world physical visual degradation, and this decrease may be nonlinear.
 
 ### Phase 5: Analysis, Visualization & Reporting
 **Status:** `☐ To-Do`
