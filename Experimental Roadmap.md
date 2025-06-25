@@ -28,7 +28,8 @@ To systematically quantify and compare the performance impact of real-world came
         Deliverable: Generate plots visualizing "Model Size vs. FPS" and "Model Size vs. Resource Utilization".
   - [x] Model Architecture Selection:\
         Objective: Based on the benchmark results, select one or two optimal model sizes for all subsequent degradation experiments.\
-        Criteria: Balance inference speed, performance, and resource constraints. For example, select `yolov8n.pt` as the "high-efficiency" model and `yolov8s.pt `as the "balanced-performance" model. This decision will be consistently applied throughout the research.
+        Criteria: Balance inference speed, performance, and resource constraints. 
+        Concluded from the benchmark data (e.g., yolov8n achieving only ~2.6 FPS) that yolov8n is the only model with minimal viability for CPU-based tasks, establishing it as the sole model for subsequent CPU-only experiments.
 
 ### Phase 2: Data Acquisition, Quantization & Dataset Construction
 **Status:** `✅ Completed`
@@ -60,20 +61,15 @@ To systematically quantify and compare the performance impact of real-world came
   - [x] Train Per-Level Models: For each degradation level (`Level 1, 2, 3...`), train a separate specialist model using its corresponding training data. Save the weights as `Model_A_1_best.pt`, `Model_A_2_best.pt`, etc.
   - [x] Train Mixed-Data Model: Combine the training sets from all levels to train a single, robust `Model_A_Mixed_best.pt`.
         
-### Phase 4: Systematic Degradation Experiment Execution
+### Phase 4: Generalist Model Performance Evaluation
 **Status:** `✅ Completed`
 
-**Description:** The core execution phase of the research, where all raw performance data is generated.
+**Description:** The objective of this phase was to evaluate the performance of a pre-trained generalist model (yolov8n) on the prepared dataset to acquire the first set of core experimental results.
 
 **Checklist:**
-  - [x] Execute Experiment 1 (Cross-Level Validation):\
-        Track A (Specialist Model): Evaluate every trained model (`Model_A_i`) on every level's validation set (`Level_j`). Log the results in a performance matrix.
-        Track B (Generalist Model): Evaluate the single pre-trained model (`Model_B`) on every level's validation set (for "bottle" detection). Log the results to plot a performance decay curve.
-  - [x] Execute Experiment 2 (Mixed-Data Robustness):\
-        Track A (Specialist Model): Evaluate the `Model_A_Mixed` on every level's validation set and log the results.
-  - [x] Execute Experiment 3 (Efficacy of Dehazing Pre-processing):\
-        Write and run a dehazing script on all degraded validation sets to create "restored" versions.\
-        Evaluate both `Model_A_0` and `Model_B` on these restored datasets and log the results.
+  - [x] Execute yolo val evaluation commands on all three degradation levels (Level 0, 1, 2).
+  - [x] Obtained mAP scores for yolov8n detecting bottle across all levels, quantifying the performance degradation trend and log the results.
+        
 ### Phase 5: Analysis, Visualization & Reporting
 **Status:** `☐ To-Do`
 
