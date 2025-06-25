@@ -69,7 +69,14 @@ To systematically quantify and compare the performance impact of real-world came
 **Checklist:**
   - [x] Execute yolo val evaluation commands on all three degradation levels (Level 0, 1, 2).
   - [x] Obtained mAP scores for yolov8n detecting bottle across all levels, quantifying the performance degradation trend and log the results.
+        *Experimental Results*
         
+| Degradation Level |Physical Condition	|mAP50 Score|
+| --- | --- | --- |
+| Level 0	  | Clear / Control	  | 0.841 |
+| Level 1   | Haze Level 1  | 0.685 |
+| Level 2   | Haze Level 2  | 0.074 |
+
 ### Phase 5: Analysis, Visualization & Reporting
 **Status:** `☐ To-Do`
 
