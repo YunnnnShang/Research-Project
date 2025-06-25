@@ -84,7 +84,32 @@ Performance drops with degradation: After introducing mild blur (Level 1), the m
 Performance crash point: Under moderate blur (Level 2), the model performance drops off a cliff, with mAP50 dropping to 0.074, almost completely failing.\
 Preliminary argument: The experimental results strongly demonstrate that the reliability of standard pre-trained models decreases sharply when faced with real-world physical visual degradation, and this decrease may be nonlinear.
 
-### Phase 5: Analysis, Visualization & Reporting
+### Phase 5: Specialist model evaluation (irobot)
+**Status:** `✅ Completed`
+
+**Description:** The objective of this phase was to train and test the performance of a model for a single, specific objective in the face of image degradation.
+
+**Checklist:**
+  - [x] Evaluate an existing clean baseline model (Model_R0):\
+        Use the existing best.pt model to evaluate the performance on the Level 0 validation set. This will give us an exact baseline mAP score.\
+  - [x] Train and evaluate models for degradation levels (Model_R1, Model_R2, ...):\
+        Train new models for our newly grouped degradation levels (New Level 1, New Level 2, New Level 3) and evaluate them.\
+*Experimental Results*
+
+| Degradation Level |Physical Condition	|mAP50 Score|
+| --- | --- | --- |
+| Level 0	  | Clear / Control	  | 0.983 |
+| Level 1   | Moderate Haze  | 0.995 |
+| Level 2   | Heavy Haze  | 0.951 | 
+| Level 3   | Severe Haze  | 0.412 | 
+
+*Key Conclusions*
+
+Specialized models perform well:On clear images (Level 0), the fine-tuned specialized model (mAP50=0.983) has significantly higher baseline performance than the general pre-trained model (mAP50=0.841).\
+Specialized models are extremely robust:Faced with moderate (New Level 1) and severe (New Level 2) image degradation, the performance of the specialized model barely drops (0.983 → 0.995 → 0.951), showing amazing resistance. This is in stark contrast to the general model, which begins to significantly degrade under mild degradation.\
+Specialized models have a performance inflection point:When image degradation reaches extremely severe (New Level 3), the performance of the specialized model eventually shows a significant collapse point, with mAP50 dropping sharply from 0.951 to 0.412. 
+
+### Phase 6: Analysis, Visualization & Reporting
 **Status:** `☐ To-Do`
 
 **Description:** Transform the raw data into meaningful insights, visualizations, and conclusions.
