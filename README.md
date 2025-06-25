@@ -151,15 +151,15 @@ Descripition of the milestones of this project.
   - [x] Yolov8 object detection
   - [x] Yolov8 segmentation on raspberry Pi ([Link](https://medium.com/@elvenkim1/how-to-deploy-yolov8-segmentation-on-raspberry-pi-3a70470de231)
   - [x] Try different sizes of model (nano, small, medium, large, extra large)
-     - [ ] Investigate ressource usage (use for example psutil python package). Make graphs:
-        - [ ] FPS for each model sizehttps://ai.stackexchange.com/questions/17371/calculation-of-fps-on-object-detection-task
-        - [ ] Performance for each model size on public dataset: https://docs.ultralytics.com/guides/yolo-performance-metrics/#conclusion
-     - [ ] Evaluate performance on public dataset (KITTI or COCO)
-- [ ] Transfer Learning: Train it to detect mobile robots create3 (you can choose which ones, use online datasets maybe, see https://docs.ultralytics.com/de/yolov5/tutorials/transfer_learning_with_frozen_layers/) 
-- [ ] Attach soiled glass in front of camera, investigate effect on object detection. Scenario
-   - [ ] Put robot on different places °. For each place:
-      - [ ] One rotation of 360° without glass in front camera lens
-      - [ ] One rotation of 360° with glass in front of camera lens
+     - [x] Investigate ressource usage (use for example psutil python package). Make graphs:
+        - [x] FPS for each model sizehttps://ai.stackexchange.com/questions/17371/calculation-of-fps-on-object-detection-task
+        - [x] Performance for each model size on public dataset: https://docs.ultralytics.com/guides/yolo-performance-metrics/#conclusion
+     - [x] Evaluate performance on public dataset (KITTI or COCO)
+- [x] Transfer Learning: Train it to detect mobile robots create3 (you can choose which ones, use online datasets maybe, see https://docs.ultralytics.com/de/yolov5/tutorials/transfer_learning_with_frozen_layers/) 
+- [x] Attach soiled glass in front of camera, investigate effect on object detection. Scenario
+   - [x] Put robot on different places °. For each place:
+      - [x] One rotation of 360° without glass in front camera lens
+      - [x] One rotation of 360° with glass in front of camera lens
 
 
 ## Project Workflow
