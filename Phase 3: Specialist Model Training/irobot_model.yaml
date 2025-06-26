@@ -1,0 +1,7 @@
+names:
+- irobot
+nc: 1
+path: H:\datasets\irobot
+test: images/test
+train: images/train
+val: images/val
