@@ -87,10 +87,7 @@ To systematically quantify and compare the performance impact of real-world came
 ### Phase 5: Specialist Model Performance Under Degradation
 **Status:** `✅ Completed`
 
-**Description:** This phase fully characterized the specialist model's behavior under visual degradation through two key experiments: 
-    1) A direct evaluation to measure the inherent robustness of a model trained on clear data.
-    2) A fine-tuning evaluation to measure the model's adaptability and performance recovery.
-
+**Description:** This phase fully characterized the specialist model's behavior under visual degradation through three key experiments:   1) A **direct evaluation** to measure its inherent robustness, 2) A **one-to-one fine-tuning** evaluation to measure its targeted adaptability, and 3) A **mixed-data fine-tuning** evaluation to create a single, general-purpose robust model.
 **Checklist:**
   - [x] Established Model_R0 (trained on clear data) as the baseline model.:\
         Use the existing best.pt model to evaluate the performance on the Level 0 validation set. This will give us an exact baseline mAP score.
@@ -111,9 +108,8 @@ To systematically quantify and compare the performance impact of real-world came
     Specialized models have a performance inflection point:When image degradation reaches extremely severe (New Level 3), the performance of the specialized model eventually shows a significant collapse point, with mAP50 dropping sharply from 0.951 to 0.412. 
 
   - [x] Evaluated Model_R0 on all degradation levels (L0 to L3) to establish a performance degradation curve.
-  - [x] Performed separate fine-tuning runs on each degradation level (L1 to L3), starting from Model_R0, to create adapted models.
-  - [x] Evaluated each fine-tuned model on its corresponding degradation level.\
-        Created a final comparative analysis of "Direct Evaluation" vs. "Fine-Tuning" performance, quantifying the performance gain.
+  - [x] Performed separate fine-tuning runs on each degradation level (L1 to L3), starting from Model_R0, to create adapted models. Evaluated each fine-tuned model on its corresponding degradation level.
+       Created a final comparative analysis of "Direct Evaluation" vs. "Fine-Tuning" performance, quantifying the performance gain.
 
     *Experimental Results*
 
@@ -127,11 +123,26 @@ To systematically quantify and compare the performance impact of real-world came
     | Level 3  (Severe)  | 0.412 | 0.995 | +141.5% | 
 
     *Key Conclusions*
+
     Inherent Robustness: The specialist model trained on clear data (Model_R0) demonstrated remarkable robustness against moderate and heavy degradation (Level 1 & 2), maintaining near-perfect performance.
     
     Performance Breaking Point: Under severe degradation (Level 3), the performance of Model_R0 collapsed, dropping from 0.951 to 0.412, proving that even specialist models have a clear failure threshold.
     
     Efficacy of Fine-Tuning: Fine-tuning proved to be an exceptionally effective strategy. For Level 3, it "rescued" the model from a near-failure state, restoring its performance to a near-perfect 0.995, a 141.5% relative improvement.
+
+  - [x]  Created a comprehensive dataset by merging all levels, fine-tuned Model_R0 on it to create an "all-rounder" model, and evaluated its performance on all individual levels.
+  - [x]  Created a final comparative analysis of all three training/evaluation strategies.
+
+    **Final Results: Master Comparison Table** 
+
+    The mAP@.50 scores for each strategy across all degradation levels are summarized below.
+    
+    | Degradation Level | mAP50 (Direct Eval) | mAP50 (One-to-One Fine-tune)| mAP50 ( Mixed-Data Fine-tune) |
+    | --- | --- | --- | --- |
+    | Level 0 (Clear) | 0.983 | N/A (Baseline) | 0.513 |
+    | Level 1 (Moderate)   | 0.995 | 0.995 | 0.995 |
+    | Level 2 (Heavy)  | 0.951 | 0.995 | 0.995 |
+    | Level 3  (Severe)  | 0.412 | 0.995 | 0.995 | 
 
 ### Phase 6: Analysis, Visualization & Reporting
 **Status:** `☐ To-Do`
@@ -139,14 +150,27 @@ To systematically quantify and compare the performance impact of real-world came
 **Description:** Transform the raw data into meaningful insights, visualizations, and conclusions.
 
 **Checklist:**
-  - [ ] Generate Key Visualizations:\
+  - [x] Generate Key Visualizations:\
         Create a heatmap for the performance matrix (Exp 1, Track A).\
         Create line charts for the performance decay curves (Exp 1, Track B and A).\
         Create bar charts comparing the "Mixed Model" vs. "Per-Level" performance (Exp 2).\
         Create grouped bar charts comparing the strategies: "w/o pre-processing," "w/ pre-processing," and "train-on-degraded" (Exp 3).\
         Create a final overlay line chart to directly compare the performance decay of the Specialist (Track A) vs. the Generalist (Track B) models.
-  - [ ] Draw Conclusions:\
-        Based on the visualizations, formulate answers to the core research questions. (e.g., "The fine-tuned specialist model shows greater resilience to minor degradation but suffers a steeper performance decline under heavy degradation compared to the generalist model.").
+  - [x] Draw Conclusions:\
+    
+    This phase of the experiment yielded several key conclusions regarding the model's behavior under different training strategies when faced with visual degradation.
+    
+    Inherent Robustness & Failure Point: A specialist model trained exclusively on clear data (Strategy 1) demonstrated high inherent robustness to moderate levels of degradation. However, its performance collapsed under severe degradation (mAP50 dropped from 0.951 to 0.412), establishing a clear breaking point.
+    
+    Efficacy of Targeted Adaptation: Fine-tuning the baseline model on a specific degradation level (Strategy 2) proved to be an exceptionally effective "repair" mechanism. This approach was able to restore performance to near-perfect levels (~0.995 mAP50) for each specific condition, making it the optimal strategy for predictable environments.
+    
+    Generalization vs. Specialization Trade-off:
+    
+    A single model fine-tuned on a mixed dataset of all conditions (Strategy 3) became a highly resilient "all-rounder," achieving peak performance (~0.995 mAP50) across all tested degraded conditions.
+    
+    However, this broad robustness came at a significant cost: the model's performance on clear, non-degraded data dropped substantially (mAP50 from 0.983 down to 0.513). This highlights a classic trade-off where the model "forgets" how to specialize on ideal data in order to generalize across challenging conditions.
+    
+    Overarching Finding: The experiments quantitatively demonstrate that for deployment in real-world conditions, there is a critical choice between training specialized models for known environments versus training a single, more versatile model that sacrifices peak performance in ideal conditions for high reliability across a wide range of degraded environments.
   - [ ] Finalize Report/Presentation:\
         Use the generated assets and conclusions to compile the final project report and/or presentation slides.
 
