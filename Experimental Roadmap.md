@@ -157,20 +157,14 @@ To systematically quantify and compare the performance impact of real-world came
         Create grouped bar charts comparing the strategies: "w/o pre-processing," "w/ pre-processing," and "train-on-degraded" (Exp 3).\
         Create a final overlay line chart to directly compare the performance decay of the Specialist (Track A) vs. the Generalist (Track B) models.
   - [x] Draw Conclusions:\
-    
-    This phase of the experiment yielded several key conclusions regarding the model's behavior under different training strategies when faced with visual degradation.
-    
-    Inherent Robustness & Failure Point: A specialist model trained exclusively on clear data (Strategy 1) demonstrated high inherent robustness to moderate levels of degradation. However, its performance collapsed under severe degradation (mAP50 dropped from 0.951 to 0.412), establishing a clear breaking point.
-    
-    Efficacy of Targeted Adaptation: Fine-tuning the baseline model on a specific degradation level (Strategy 2) proved to be an exceptionally effective "repair" mechanism. This approach was able to restore performance to near-perfect levels (~0.995 mAP50) for each specific condition, making it the optimal strategy for predictable environments.
-    
-    Generalization vs. Specialization Trade-off:
-    
-    A single model fine-tuned on a mixed dataset of all conditions (Strategy 3) became a highly resilient "all-rounder," achieving peak performance (~0.995 mAP50) across all tested degraded conditions.
-    
-    However, this broad robustness came at a significant cost: the model's performance on clear, non-degraded data dropped substantially (mAP50 from 0.983 down to 0.513). This highlights a classic trade-off where the model "forgets" how to specialize on ideal data in order to generalize across challenging conditions.
-    
-    Overarching Finding: The experiments quantitatively demonstrate that for deployment in real-world conditions, there is a critical choice between training specialized models for known environments versus training a single, more versatile model that sacrifices peak performance in ideal conditions for high reliability across a wide range of degraded environments.
+        This phase of the experiment yielded several key conclusions regarding the model's behavior under different training strategies when faced with visual degradation.\
+        Inherent Robustness & Failure Point: A specialist model trained exclusively on clear data (Strategy 1) demonstrated high inherent robustness to moderate levels of degradation. However, its performance collapsed under severe degradation (mAP50 dropped from 0.951 to 0.412), establishing a clear breaking point.\
+        Efficacy of Targeted Adaptation: Fine-tuning the baseline model on a specific degradation level (Strategy 2) proved to be an exceptionally effective "repair" mechanism. This approach was able to restore performance to near-perfect levels (~0.995 mAP50) for each specific condition, making it the optimal strategy for predictable environments.\
+        Generalization vs. Specialization Trade-off:\
+         A single model fine-tuned on a mixed dataset of all conditions (Strategy 3) became a highly resilient "all-rounder," achieving peak performance (~0.995 mAP50) across all tested degraded conditions.\
+        However, this broad robustness came at a significant cost: the model's performance on clear, non-degraded data dropped substantially (mAP50 from 0.983 down to 0.513). This highlights a classic trade-off where the model "forgets" how to specialize on ideal data in order to generalize across challenging conditions.\
+        Overarching Finding: The experiments quantitatively demonstrate that for deployment in real-world conditions, there is a critical choice between training specialized models for known environments versus training a single, more versatile model that sacrifices peak performance in ideal conditions for high reliability across a wide range of degraded environments.
+        
   - [ ] Finalize Report/Presentation:\
         Use the generated assets and conclusions to compile the final project report and/or presentation slides.
 
