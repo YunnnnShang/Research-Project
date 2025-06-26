@@ -1,0 +1,6 @@
+# Example for Level 2
+path: H:/datasets/irobot/final_leveled_datasets/level_2_heavy_haze
+train: train/images
+val: val/images
+nc: 1
+names: ['irobot']
