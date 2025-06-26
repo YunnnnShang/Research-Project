@@ -69,45 +69,69 @@ To systematically quantify and compare the performance impact of real-world came
 **Checklist:**
   - [x] Execute yolo val evaluation commands on all three degradation levels (Level 0, 1, 2).
   - [x] Obtained mAP scores for yolov8n detecting bottle across all levels, quantifying the performance degradation trend and log the results.\
-*Experimental Results*
+    *Experimental Results*
+    
+    | Degradation Level |Physical Condition	|mAP50 Score|
+    | --- | --- | --- |
+    | Level 0	  | Clear / Control	  | 0.841 |
+    | Level 1   | Haze Level 1  | 0.685 |
+    | Level 2   | Haze Level 2  | 0.074 |
 
-| Degradation Level |Physical Condition	|mAP50 Score|
-| --- | --- | --- |
-| Level 0	  | Clear / Control	  | 0.841 |
-| Level 1   | Haze Level 1  | 0.685 |
-| Level 2   | Haze Level 2  | 0.074 |
+    *Key Conclusions*
+    
+    Baseline performance is robust: On clear images (Level 0), the yolov8n model performs well (mAP50 = 0.841), demonstrating the model's inherent capabilities.\
+    Performance drops with degradation: After introducing mild blur (Level 1), the model performance drops significantly (by about 18.5%), but remains at a usable level.\
+    Performance crash point: Under moderate blur (Level 2), the model performance drops off a cliff, with mAP50 dropping to 0.074, almost completely failing.\
+    Preliminary argument: The experimental results strongly demonstrate that the reliability of standard pre-trained models decreases sharply when faced with real-world physical visual degradation, and this decrease may be nonlinear.
 
-*Key Conclusions*
-
-Baseline performance is robust: On clear images (Level 0), the yolov8n model performs well (mAP50 = 0.841), demonstrating the model's inherent capabilities.\
-Performance drops with degradation: After introducing mild blur (Level 1), the model performance drops significantly (by about 18.5%), but remains at a usable level.\
-Performance crash point: Under moderate blur (Level 2), the model performance drops off a cliff, with mAP50 dropping to 0.074, almost completely failing.\
-Preliminary argument: The experimental results strongly demonstrate that the reliability of standard pre-trained models decreases sharply when faced with real-world physical visual degradation, and this decrease may be nonlinear.
-
-### Phase 5: Specialist model evaluation (irobot)
+### Phase 5: Specialist Model Performance Under Degradation
 **Status:** `✅ Completed`
 
-**Description:** The objective of this phase was to train and test the performance of a model for a single, specific objective in the face of image degradation.
+**Description:** This phase fully characterized the specialist model's behavior under visual degradation through two key experiments: 
+    1) A direct evaluation to measure the inherent robustness of a model trained on clear data.
+    2) A fine-tuning evaluation to measure the model's adaptability and performance recovery.
 
 **Checklist:**
-  - [x] Evaluate an existing clean baseline model (Model_R0):\
-        Use the existing best.pt model to evaluate the performance on the Level 0 validation set. This will give us an exact baseline mAP score.\
-  - [x] Train and evaluate models for degradation levels (Model_R1, Model_R2, ...):\
-        Train new models for our newly grouped degradation levels (New Level 1, New Level 2, New Level 3) and evaluate them.\
-*Experimental Results*
+  - [x] Established Model_R0 (trained on clear data) as the baseline model.:\
+        Use the existing best.pt model to evaluate the performance on the Level 0 validation set. This will give us an exact baseline mAP score.
+    
+    *Experimental Results*
+    
+    | Degradation Level |Physical Condition	|mAP50 Score|
+    | --- | --- | --- |
+    | Level 0	  | Clear / Control	  | 0.983 |
+    | Level 1   | Moderate Haze  | 0.995 |
+    | Level 2   | Heavy Haze  | 0.951 | 
+    | Level 3   | Severe Haze  | 0.412 | 
+    
+    *Key Conclusions*
+    
+    Specialized models perform well:On clear images (Level 0), the fine-tuned specialized model (mAP50=0.983) has significantly higher baseline performance than the general pre-trained model (mAP50=0.841).\
+    Specialized models are extremely robust:Faced with moderate (New Level 1) and severe (New Level 2) image degradation, the performance of the specialized model barely drops (0.983 → 0.995 → 0.951), showing amazing resistance. This is in stark contrast to the general model, which begins to significantly degrade under mild degradation.\
+    Specialized models have a performance inflection point:When image degradation reaches extremely severe (New Level 3), the performance of the specialized model eventually shows a significant collapse point, with mAP50 dropping sharply from 0.951 to 0.412. 
 
-| Degradation Level |Physical Condition	|mAP50 Score|
-| --- | --- | --- |
-| Level 0	  | Clear / Control	  | 0.983 |
-| Level 1   | Moderate Haze  | 0.995 |
-| Level 2   | Heavy Haze  | 0.951 | 
-| Level 3   | Severe Haze  | 0.412 | 
+  - [x] Evaluated Model_R0 on all degradation levels (L0 to L3) to establish a performance degradation curve.
+  - [x] Performed separate fine-tuning runs on each degradation level (L1 to L3), starting from Model_R0, to create adapted models.
+  - [x] Evaluated each fine-tuned model on its corresponding degradation level.\
+        Created a final comparative analysis of "Direct Evaluation" vs. "Fine-Tuning" performance, quantifying the performance gain.
 
-*Key Conclusions*
+    *Experimental Results*
 
-Specialized models perform well:On clear images (Level 0), the fine-tuned specialized model (mAP50=0.983) has significantly higher baseline performance than the general pre-trained model (mAP50=0.841).\
-Specialized models are extremely robust:Faced with moderate (New Level 1) and severe (New Level 2) image degradation, the performance of the specialized model barely drops (0.983 → 0.995 → 0.951), showing amazing resistance. This is in stark contrast to the general model, which begins to significantly degrade under mild degradation.\
-Specialized models have a performance inflection point:When image degradation reaches extremely severe (New Level 3), the performance of the specialized model eventually shows a significant collapse point, with mAP50 dropping sharply from 0.951 to 0.412. 
+    The mAP@.50 scores clearly demonstrate the performance drop under direct evaluation and the subsequent recovery after fine-tuning.
+
+    | Degradation Level | mAP50 (Direct Eval of Model_R0 | mAP50 (After Fine-Tuning)|Performance Gain |
+    | --- | --- | --- | --- |
+    | Level 0 (Clear) | 0.983 | N/A (Baseline) | N/A |
+    | Level 1 (Moderate)   | 0.995 | 0.995 | 0.0% |
+    | Level 2 (Heavy)  | 0.951 | 0.995 | +4.6% |
+    | Level 3  (Severe)  | 0.412 | 0.995 | +141.5% | 
+
+    *Key Conclusions*
+    Inherent Robustness: The specialist model trained on clear data (Model_R0) demonstrated remarkable robustness against moderate and heavy degradation (Level 1 & 2), maintaining near-perfect performance.
+    
+    Performance Breaking Point: Under severe degradation (Level 3), the performance of Model_R0 collapsed, dropping from 0.951 to 0.412, proving that even specialist models have a clear failure threshold.
+    
+    Efficacy of Fine-Tuning: Fine-tuning proved to be an exceptionally effective strategy. For Level 3, it "rescued" the model from a near-failure state, restoring its performance to a near-perfect 0.995, a 141.5% relative improvement.
 
 ### Phase 6: Analysis, Visualization & Reporting
 **Status:** `☐ To-Do`
