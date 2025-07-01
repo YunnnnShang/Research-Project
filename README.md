@@ -321,7 +321,7 @@ This is the core step where all data streams are unified.
        H:\project_data\raw_mcaps\rosbagr5\r5_8\bag_r5_8.mcap
    ```
 Output: The final, unified final_ml_dataset.csv is generated in each run folder.
-### Step 8: Final Comparative Analysis
+### Step 8: Comparative Analysis
 Run the Analysis Script: Use final_analysis.py to load the final datasets from the runs you want to compare.
    ```sh
    # Example comparing three specific runs
@@ -332,6 +332,89 @@ Run the Analysis Script: Use final_analysis.py to load the final datasets from t
        --output_dir H:\project_data\final_reports
    ```
 Output: The script prints summary statistics to the console and saves comparison plots to the specified output directory, allowing you to draw final conclusions about the impact of camera degradation.
+
+### Step 9: Creating the Custom PerceptionMetrics ROS2 Message
+
+The step in building our real-time system is to establish the communication protocol between nodes. To do this, we will create a custom ROS2 message to carry all relevant perception and Image Quality Assessment (IQA) metrics. All development and compilation will be performed on a primary Raspberry Pi (e.g., r5), which will serve as our Development Platform. The resulting package will then be deployed to the other robots (r6, r7).
+
+1. Create a New ROS2 Package `On: Your Raspberry Pi r5 (Development Pi)`   
+   ```sh
+   # SSH into your r5 robot.
+   # Navigate to the src directory of your ROS2 workspace (e.g., ~/ros2_ws/src):
+   cd ~/ros2_ws/src
+   #Create a new package specifically for our custom interfaces:
+   ros2 pkg create --build-type ament_cmake robot_interfaces
+   ```
+
+2. Define the .msg File
+   ```sh
+   # Navigate into the newly created package and create a msg directory:
+   cd ~/ros2_ws/src/robot_interfaces
+   mkdir msg
+   
+   # create a new file named PerceptionMetrics.msg
+   nano msg/PerceptionMetrics.msg
+   ```
+   Copy and paste the following content into the editor:
+   ```sh
+   # Header includes timestamp and frame_id for synchronization.
+   std_msgs/Header header
+   
+   # Image Quality Assessment (IQA) Score.
+   float32 brisque_score
+   
+   # Object Detection Key Performance Indicators (KPIs).
+   int32 num_detections
+   float32 avg_confidence
+   ```
+3. Configure the Package to Build the Message
+
+   Open `~/ros2_ws/src/robot_interfaces/package.xml` with `nano`.
+
+    Add the following lines inside the `<package>` tag to declare the necessary dependencies for message generation:
+   ```sh
+   <build_depend>rosidl_default_generators</build_depend>
+   <exec_depend>rosidl_default_runtime</exec_depend>
+   <member_of_group>rosidl_interface_packages</member_of_group>
+   ```
+   Open `~/ros2_ws/src/robot_interfaces/CMakeLists.txt` with `nano`.
+
+   Add the following lines after the existing find_package(ament_cmake REQUIRED) line:
+   ```sh
+   find_package(rosidl_default_generators REQUIRED)
+   find_package(std_msgs REQUIRED)
+   ```
+   Add the following block to the end of the file to instruct the compiler to generate the message code:
+   ```sh
+   rosidl_generate_interfaces(${PROJECT_NAME}
+     "msg/PerceptionMetrics.msg"
+     DEPENDENCIES std_msgs
+   )
+   ```
+5. Build and Verify the Package
+   Build the Package:
+   ```sh
+   cd ~/ros2_ws
+   colcon build --packages-select robot_interfaces
+   ```
+   Source the Workspace: After a successful build, source your workspace's setup file to make the new message type available to the ROS2 system:
+   ```
+   source install/setup.bash
+   ```
+   Verify the Message: If successful, the terminal will print the content of your .msg file.
+   ```
+   ros2 interface show robot_interfaces/msg/PerceptionMetrics
+   ```
+7. Deploying to Other Robots
+   Copy the entire `~/ros2_ws/src/robot_interfaces` source folder from `r5` to the `~/ros2_ws/src/ `directory on both `r6` and `r7` (using scp or rsync).
+   
+   On `r6` and `r7`, run `colcon build --packages-select robot_interfaces` to build the package locally on each machine.
+8. 
+   
+
+
+
+
 
 <!-- Project Structure -->
 ## Project Structure
