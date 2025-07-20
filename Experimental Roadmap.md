@@ -143,33 +143,68 @@ To systematically quantify and compare the performance impact of real-world came
     | Level 1 (Moderate)   | 0.995 | 0.995 | 0.995 |
     | Level 2 (Heavy)  | 0.951 | 0.995 | 0.995 |
     | Level 3  (Severe)  | 0.412 | 0.995 | 0.995 | 
-
-### Phase 6: Real-Time, Unsupervised Degradation Detection in a Multi-Robot Fleet
+ 
+### Phase 6: Behavioral Analysis from MCAP Data
 **Status:**  `In Progress`
 
-**Description:** This final experimental phase aims to validate the core research hypothesis: that camera degradation can be detected in real-time in an unsupervised manner by comparing perception metrics across a fleet of robots. The experiment will directly compare the sensitivity of a specialist model versus a generalist model as the underlying "sensor" for this diagnostic task.
+**Description:**  To analyze the impact of camera degradation on the robot's physical driving behavior during an obstacle avoidance task. This serves as a "functional" or "system-level" assessment, complementing the direct image quality (IQA) and object detection (YOLOv8) analyses.
 
-**Checklist:**
-  - [x] ROS2 System Development:\
-        Develop Custom ROS2 Message: Create PerceptionMetrics.msg to package brisque_score, num_detections, and avg_confidence.\
-        Develop Configurable perception_node: This node, to be run on each robot, will accept a model path, perform inference, calculate IQA scores, and publish the results on a unique topic.\
-        Develop fleet_diagnostics_node: This central node will subscribe to all robot metrics, calculate the real-time fleet average for each KPI, and implement unsupervised logic to detect and flag any robot that consistently deviates from the group.
-        
-  - [ ] Experiment A: Specialist Model (Model_R0) Validation:\
-        Deploy: Launch the system with Model_R0 on all three robots.\
-        Baseline Run: Operate the fleet for a set duration with no degradation to establish normal metric distribution.\
-        Introduce Degradation: Apply a physical haze plate to one robot's camera during operation.\
-        Analyze: Confirm that the fleet_diagnostics_node successfully and automatically identifies the degraded robot as an outlier.
-        
-  - [ ] Experiment B: Generalist Model (yolov8n.pt) Validation:\
-        Re-deploy: Relaunch the system, this time with the general-purpose yolov8n.pt model on all three robots.\
-        Repeat Experiment: Execute the exact same baseline and degradation procedure as in Experiment A.\
-        Analyze: Record the system's ability to identify the degraded robot using the generalist model's output.
-        
-  - [ ] Comparative Analysis & Final Conclusion:\
-        Compare Results: Directly compare the sensitivity, stability, and reliability of the signals from Experiment A and B.\
-        Formulate Conclusion: Provide a definitive answer on the feasibility of this unsupervised detection method and give a final recommendation on which model type is better suited for this diagnostic task.
-        
+**Workflow:**
+* Step 1: Raw Behavior Data Extraction (📍 on Raspberry Pi)
+
+  The Raspberry Pi, with its native ROS 2 installation, was used as a pre-processing node to extract raw time-series data from the MCAP files into a portable format.
+  
+  Action: For each experimental run's `.mcap` file, a Python script was executed. Script Used: `extract_behavior_to_csv.py`
+  
+  Function: This script reads an `.mcap` file, subscribes to the `/odom` and `/cmd_vel` topics, and writes the entire message history for each into two separate CSV files.
+
+* Step 2: Data Transfer (🍓 RPi → 💻 PC)
+
+  The generated `odom_data.csv` and `cmd_vel_data.csv` files were transferred from the Raspberry Pi to their corresponding run folders on the Windows PC for the final analysis.
+
+* Step 3: Behavioral Metric Calculation & Analysis (📍 on Windows PC)
+  
+  A comprehensive Python script was run to process the CSVs from all relevant runs. Script Used: `analyze_robot_behavior.py`
+  
+  Function: This script loads the `odom_data.csv` and `cmd_vel_data.csv` for each specified run and calculates the following key behavioral metrics:
+  1.  **Stop Percentage / Hesitation:** The percentage of the total run time where the robot's commanded velocity was effectively zero.
+  2.  **Total Path Length:** The total distance in meters covered by the robot, calculated from odometry data.
+  3.  **Path Smoothness (RMS Jerk):** The Root Mean Square of the robot's jerk (the rate of change of acceleration), where a higher value indicates more erratic, less smooth motion.
+
+**Key Findings & Interpretation**
+
+The behavioral analysis yielded complex and insightful results, revealing a non-linear relationship between camera degradation and system-level performance.
+
+* **Inconsistent Baseline:** The two control robots (`r6` and `r7`) exhibited significantly different baseline behaviors, with `r7` showing much higher natural hesitation (11.3% stop time) than `r6` (0.7%). This indicates that the obstacle avoidance algorithm has inherent variability.
+
+* **Non-Linear Impact of Degradation:** Contrary to a simple hypothesis, increased camera blur did not lead to a linear increase in hesitant or erratic behavior.
+    * The **mildly and moderately degraded** runs (`r5_8`, `r5_9`) showed **zero hesitation**, appearing paradoxically more "confident" than the control robots.
+    * The **most jerky and erratic** run (`RMS_Jerk` = 10.4) was the one with the **least degradation** (`r5_8`).
+    * The **most severely degraded** run (`r5_10`) was the only one in the experimental group to show significant hesitation (4.13%), suggesting a performance cliff or a change in failure mode once degradation becomes critical.
+
+* **Core Conclusion:** The impact of sensor degradation on a robot's behavior is not straightforward. Mild degradation might "simplify" the world for an algorithm by removing visual noise, leading to seemingly bolder actions. This highlights that evaluating system performance requires a multi-faceted approach, as direct task performance (like YOLOv8) and system behavior can tell different, sometimes conflicting, stories.
+
+---
+
+## Required Scripts for this Phase
+
+To replicate this phase of the experiment, the following two scripts are required:
+
+1.  **`extract_behavior_to_csv.py`**
+    * **Purpose:** To be run on the Raspberry Pi. Extracts time-series data from `/odom` and `/cmd_vel` topics within an `.mcap` file and saves them as `odom_data.csv` and `cmd_vel_data.csv`.
+2.  **`analyze_robot_behavior.py`**
+    * **Purpose:** To be run on the Windows PC. Takes multiple run folders (each containing the CSVs from the previous step) as input, calculates the behavioral metrics (Hesitation, Path Length, Jerk), and outputs a comparative summary table.
+
+
+
+
+
+
+
+
+
+
+
 ### Phase 7: Analysis, Visualization & Reporting
 **Status:** `☐ To-Do`
 
