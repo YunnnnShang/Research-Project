@@ -270,7 +270,7 @@ Behavioral analysis yielded complex and insightful results, revealing non-linear
 2. **Non-Linear Impact of Degradation**:
    - Contrary to simple hypothesis, increased camera blur did not lead to linear increase in hesitant or erratic behavior
    - **Mildly and moderately degraded** runs (r5_8, r5_9) showed **zero hesitation**, appearing paradoxically more "confident" than control robots
-   - **Most jerky and erratic** run (RMS_Jerk = 10.4) was the one with **least degradation** (r5_8)
+   - **Most jerky and erratic** run (RMS_Jerk = 10.4) was the one with **least degradation** (r5_8) — this counterintuitive phenomenon may be because visual noise from mild degradation causes the algorithm to make more micro-adjustments rather than complete failure
    - **Most severely degraded** run (r5_10) was only one in experimental group to show significant hesitation (4.13%), suggesting performance cliff or change in failure mode once degradation becomes critical
 
 3. **Core Conclusion**:
